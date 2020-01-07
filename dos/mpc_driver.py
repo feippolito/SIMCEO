@@ -51,29 +51,30 @@ class MPC:
         # QP problem quadratic term
         Qkron = sparse.kron(sparse.eye(self.npred),Q)
         Rkron = sparse.kron(sparse.eye(self.npred),R)
+        Gamma = sparse.csc_matrix(Gamma)
         P = sparse.csc_matrix((Gamma.T.dot(Qkron).dot(Gamma)) + Rkron)
 
         # Constraint matrices
         # Test if there are incremental bound constraints
-        if(empty(dumin) and not empty (dumax)):
+        if(empty(dumin) and not empty(dumax)):
             dumin = -np.inf*np.ones(self.nu)
         elif (not empty(dumin) and empty (dumax)):
             dumax = np.inf*np.ones(self.nu)
         Dumin = np.kron(np.ones(self.npred),dumin)
         Dumax = np.kron(np.ones(self.npred),dumax)
-        if (empty(dumin) and empty (dumax)):
+        if (empty(dumin) and empty(dumax)):
             mpcIncConstr = False
         else:
             mpcIncConstr = True
 
         # Test if there are absolute bound constraints
-        if(empty(umin) and not empty (umax)):
+        if(empty(umin) and not empty(umax)):
             umin = -np.inf*np.ones(self.nu)
         elif (not empty(umin) and empty (umax)):
             umax = np.inf*np.ones(self.nu)
         Umin = np.kron(np.ones(self.npred),umin)
         Umax = np.kron(np.ones(self.npred),umax)
-        if (empty(umin) and empty (umax)):
+        if (empty(umin) and empty(umax)):
             mpcAbsConstr = False
             c = np.array([])
         else:
@@ -126,8 +127,8 @@ class MPC:
         xa = np.concatenate((x-self.__xpast,self.__xpast), axis=0)
 
         # QP linear term - demands state feedback
-        q = np.dot(np.dot(self.mpc_qpdt['GammaT'],self.mpc_qpdt['Qkron']),
-                (np.dot(self.mpc_qpdt['Phi'],xa)))
+        q = np.dot(self.mpc_qpdt['GammaT'].dot(self.mpc_qpdt['Qkron']),
+                np.dot(self.mpc_qpdt['Phi'],xa))
         # QP input constraints
         if(self.mpc_qpdt['IncConstr'] and self.mpc_qpdt['AbsConstr']):
             lb = np.concatenate((self.mpc_qpdt['Dumin'],
@@ -143,7 +144,7 @@ class MPC:
         else:
             pass
         # Update QP variables
-        if self.mpc_qpdt['IncConstr'] or self.mpc_qpdt['IncConstr']:
+        if self.mpc_qpdt['IncConstr'] or self.mpc_qpdt['AbsConstr']:
             self.qpp.update(q, lb, ub)
         else:
             self.qpp.update(q=q) 
