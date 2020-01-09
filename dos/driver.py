@@ -296,7 +296,12 @@ class Client(Driver):
             self.split = kwargs['split']
         except KeyError:
             self.split = {'indices_or_sections':1,'axis':0}
+        try:
+            self.reorder = kwargs['reorder']
+        except:
+            self.reorder = None
         self.system = None
+
 
     def start(self):
         self.logger.debug('Starting!')
@@ -307,13 +312,19 @@ class Client(Driver):
         if self.inputs and (step>=self.delay and (step-self.delay)%self.sampling_rate==0):
             self.logger.debug('Updating!')
             u = np.hstack([_.data.reshape(1,-1) for _  in self.inputs.values()])
+            if self.reorder:
+                self.logger.debug('Reordering! ')
+                # Reorder data before update -yaml-reorder{segments:n1,groups:n2,inputs:n3}
+                u = np.hstack([x[i].reshape(1,-1) for i in range(self.reorder['segments'])\
+                                    for x in np.split(u.reshape(-1,self.reorder['groups']),\
+                                                      self.reorder['inputs'])])
             self.system.update(u)
             self.logger.debug('u: %s',u.shape)
 
     def output(self,step):
         if step>=self.delay:
-            a = 0
-            b = 0
+            #a = 0
+            #b = 0
             data = np.split( self.system.output().reshape(self.shape), **self.split)
             for k,v in self.outputs.items():
                 if (step-self.delay)%v.sampling_rate==0:

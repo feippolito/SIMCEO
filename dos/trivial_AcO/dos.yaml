@@ -1,7 +1,8 @@
 simulation:
   sampling frequency: 1
   duration: 50
-  server: {IP: 54.200.122.185}
+  server:
+    IP: 127.0.0.1
 drivers:
   M1:
     delay: 0
