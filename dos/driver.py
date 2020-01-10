@@ -298,7 +298,7 @@ class Client(Driver):
             self.split = {'indices_or_sections':1,'axis':0}
         try:
             self.reorder = kwargs['reorder']
-        except:
+        except KeyError:
             self.reorder = None
         self.system = None
 
