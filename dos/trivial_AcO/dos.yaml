@@ -3,6 +3,7 @@ simulation:
   duration: 50
   server:
     IP: 127.0.0.1
+
 drivers:
   M1:
     delay: 0
@@ -22,6 +23,7 @@ drivers:
         size: [7, 3]
       Rxyz:
         size: [7, 3]
+
   wfs48:
     delay: 0
     sampling_rate: 1
@@ -30,6 +32,7 @@ drivers:
         sampling_rate: 1
         size: 273
         logs: {decimation: 1}
+  
   AcO_controller:
     server: false
     inputs:
