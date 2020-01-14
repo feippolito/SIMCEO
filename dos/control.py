@@ -4,7 +4,8 @@ from .mpc_driver import MPC
 from .sh_aco_driver import SHAcO
 from .sh_aco_debug_driver import SHAcO_debug
 from .MountController import Mount
-from .M1PosHP0Controller import M1PosHP0
+#from .M1PosHP0Controller import M1PosHP0
+from .rM1Pos0Controller import rM1Pos0
 from .source import Source
 import numpy as np
 class System:
