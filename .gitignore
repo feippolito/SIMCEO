@@ -1,5 +1,3 @@
-*.o
-*.so
 *.mexa64
 *.aux
 *.log
@@ -29,7 +27,6 @@ sandbox
 *.zip
 ReconstructorM.pickle
 ES2M1RBM.pickle
-*init__.py
 timing
 simceo.code-workspace
 testDT
