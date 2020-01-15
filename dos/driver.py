@@ -138,6 +138,9 @@ class Server(Driver):
             self.msg['method_id'] = ''
             self.msg['args'].clear()
             reply = self.server._recv_()
+
+        self.output(step)
+        
     def output(self,step):
         if step>=self.delay:
                 m = 'Outputs'
@@ -325,6 +328,7 @@ class Client(Driver):
             '''
             self.system.update(u)
             self.logger.debug('u: %s',u.shape)
+            self.output(step)
 
     def output(self,step):
         if step>=self.delay:

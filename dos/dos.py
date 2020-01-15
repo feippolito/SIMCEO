@@ -120,7 +120,7 @@ class DOS(threading.Thread):
         for l in range(self.N_SAMPLE):
             self.logger.debug('Step #%d',l)
             self.__k_step = l
-            yield [x.update(l) for x in v] + [x.output(l) for x in v]
+            yield [x.update(l) for x in v]# + [x.output(l) for x in v]
 
     def run(self):
         if not self.pushed:
