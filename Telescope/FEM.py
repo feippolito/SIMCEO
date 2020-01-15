@@ -574,9 +574,11 @@ class FEM:
     def Init(self,dt=0.5e-3,
               inputs=None,outputs=None,
               hsv_rel_threshold=None,n_mode_max=None,
-              start_idx=0):
+              start_idx=0,
+              duration=0):
         
         self.logger.info('Init')
+        self.logger.info('Total simualtion time:' + str(duration))
         #self.hsv_sort(start_idx=start_idx)
 
         self.reduce(inputs=inputs,outputs=outputs,

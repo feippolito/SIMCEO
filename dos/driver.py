@@ -197,7 +197,8 @@ class Server(Driver):
             self.msg_args['Start'].update(prm['FEM']['build'])
             self.msg_args['Init'].update({'dt':self.tau,
                                           'inputs':list(self.inputs.keys()),
-                                          'outputs':list(self.outputs.keys())})
+                                          'outputs':list(self.outputs.keys()),
+                                          'duration': prm['duration']})
             self.msg_args['Init'].update(prm['FEM']['reduction'])
             self.msg_args['Update'].update(\
                     {k_i:v_i.data for k_i,v_i in self.inputs.items()})

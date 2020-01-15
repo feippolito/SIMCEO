@@ -88,6 +88,8 @@ class DOS(threading.Thread):
                     prm = pickle.load(f)
             except:
                 raise
+            if k_d == 'FEM':
+                prm['duration'] = self.cfg['simulation']['duration'] 
             d.associate(prm)
         self.__start = map(lambda x: x.start(), self.drivers.values())
         self.__init = map(lambda x: x.init(), self.drivers.values())
