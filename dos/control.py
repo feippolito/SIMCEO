@@ -20,12 +20,14 @@ class System:
 
     def update(self,u):
         try:
-            self.__yout = self.system.C @ self.__xout + self.system.D @ u
             self.__xout = self.system.A @ self.__xout + self.system.B @ u
+            self.__yout = self.system.C @ self.__xout + self.system.D @ u
+            
         except ValueError:
             u = u.reshape(self.system.B.shape[1],1)
-            self.__yout = self.system.C @ self.__xout + self.system.D @ u
             self.__xout = self.system.A @ self.__xout + self.system.B @ u
+            self.__yout = self.system.C @ self.__xout + self.system.D @ u
+            
 
     def output(self):
         return np.atleast_2d(self.__yout.ravel())
