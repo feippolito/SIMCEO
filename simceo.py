@@ -197,7 +197,7 @@ class SGMT(Sfunction):
     def Init(self, state={}):
         for mirror in state:
             self.state0[mirror].update(state[mirror])
-            self.logger.info("GMT state set to %s",self.state0)
+            self.logger.debug("GMT state set to %s",self.state0)
     def Outputs(self, args=None):
         pass
 class _Atmosphere_():
