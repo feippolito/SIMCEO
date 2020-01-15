@@ -1,6 +1,6 @@
 simulation:
   sampling frequency: 2000
-  duration: 10
+  duration: 7
   server:
     IP: 127.0.0.1
 

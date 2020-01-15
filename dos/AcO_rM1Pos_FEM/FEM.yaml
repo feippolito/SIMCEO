@@ -1,7 +1,7 @@
 FEM:
   build:
     state_space_filename: ../database/matmodels/consolidated_withSSBM.mat
-    log_states: true
+    log_states: false
     #bending_modes:
     #  mode: comparison
     #  segment: 1
