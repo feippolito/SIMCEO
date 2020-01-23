@@ -1,0 +1,11 @@
+FEM:
+  build:
+    state_space_filename: ../database/matmodels/old_consolidated/consolidated.mat
+    log_states: False
+    reorder_RBM: False
+    #bending_modes:
+    #  mode: comparison
+    #  segment: 1
+    #  ptt_path: ../database/bendingmodes/SSBM_transformation_matrices.matw
+  reduction:
+    start_idx: 3

@@ -31,3 +31,4 @@ timing
 simceo.code-workspace
 testDT\
 *.sclogs
+html/

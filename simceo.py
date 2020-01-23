@@ -578,11 +578,12 @@ class broker(threading.Thread):
             self.logger.debug('Calling out: %s.%s',class_id,method_id)
             #print "@ %.3fs: %s->%s"%(currentTime,jmsg["tag"],method_id)
             #tid = ceo.StopWatch()
-            try:
+            #try:
                 #tid.tic()
-                args_out = getattr( self[class_id], method_id )( **msg["args"] )
+            args_out = getattr( self[class_id], method_id )( **msg["args"] )
                 #tid.toc()
                 #print "%s->%s: %.2f"%(class_id,method_id,tid.elapsedTime) 
+            '''
             except Exception as E:
                 print("@(broker)> The server has failed!")
                 print(msg)
@@ -590,6 +591,7 @@ class broker(threading.Thread):
                 print("@(broker)> Recovering gracefully...")
                 class_id = ""
                 args_out = "The server has failed!"
+            '''
             if method_id=="Terminate":
                 if class_id[:2]=="OP":
                     self.ops.pop(0)

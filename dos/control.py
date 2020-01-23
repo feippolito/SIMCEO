@@ -4,9 +4,11 @@ from .mpc_driver import MPC
 from .sh_aco_driver import SHAcO
 from .sh_aco_debug_driver import SHAcO_debug
 from .MountController import Mount
-from .rM1Pos0Controller import rM1Pos0
+from .M1Pos0Controller import M1Pos0
+from .M1PosDebug0Controller import M1PosDebug0
 from .source import Source
 import numpy as np
+
 class System:
     def __init__(self,**kwargs):
         self.system = signal.dlti(*tuple(kwargs['parameters'].values()))

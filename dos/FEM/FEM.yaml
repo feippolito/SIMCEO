@@ -1,7 +1,13 @@
 FEM:
   build:
-    second_order_filename: dos/FEM/modal_state_space_model.py.mat
-    reorder_RBM: false
+    fem_io_filename: ../database/bendingmodes/FEM_IO_MODIFIED.mat
+    state_space_filename: ../database/matmodels/consolidated_MODIFIED.mat
+    
+    #output_support:
+    #  bending_modes:
+    #    variable: {name: M1_surfaces_d, segment: 0}
+    #    path: ../database/bendingmodes/STBM_transformation_matrices.mat
+    #
   reduction:
     hsv_rel_threshold: 1.0e-3
     start_idx: 3
