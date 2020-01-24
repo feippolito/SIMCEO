@@ -1,6 +1,6 @@
 simulation:
   sampling frequency: 2000
-  duration: 150
+  duration: 3
   server:
     IP: 127.0.0.1
 
@@ -74,31 +74,61 @@ drivers:
         logs: {decimation: 1}
         lien: [FEM, OSS_Harpoint_delta_F]
 
+  Mount:
+    sampling_rate: 1
+    server: false
+    inputs:
+      MountFeedback_1:
+        lien: [FEM, OSS_AzDrive_D]
+      MountFeedback_2:
+        lien: [FEM, OSS_ElDrive_D]
+      MountFeedback_3:
+        lien: [FEM, OSS_GIRDrive_D]
+    split:
+      indices_or_sections: [8,16]
+      axis: 1
+    outputs:
+      Mount_AzDrive_F:
+        logs: {decimation: 1}
+        lien: [FEM, OSS_AzDrive_F]
+      Mount_ElDrive_F:
+        logs: {decimation: 1}
+        lien: [FEM, OSS_ElDrive_F]
+      Mount_GIRDrive_F:
+        logs: {decimation: 1}
+        lien: [FEM, OSS_GIRDrive_F]
+
   FEM:
     inputs:
+      OSS_AzDrive_F:
+        size: 8
+      OSS_ElDrive_F:
+        size: 8
+      OSS_GIRDrive_F:
+        size: 4
       OSS_Harpoint_delta_F:
         size: 42
     outputs:
       OSS_AzDrive_D:
         size: 8
-        logs: {decimation: 1}
       OSS_ElDrive_D:
         size: 8
-        logs: {decimation: 1}
       OSS_GIRDrive_D:
         size: 4
-        logs: {decimation: 1}
       OSS_M1_lcl:
         size: 42
         logs: {decimation: 1}
-      OSS_Hardpoint_D:
-        size: 84
-        logs: {decimation: 1}
+      #OSS_Hardpoint_D:
+      #  size: 84
+      #  logs: {decimation: 1}
       OSS_M1_Translation:
         size: [7, 3]
         logs: {decimation: 1}
       OSS_M1_Rotation:
         size: [7, 3]
+        logs: {decimation: 1}
+      bending_modes:
+        size: 165
         logs: {decimation: 1}
 
 COMMENTS:

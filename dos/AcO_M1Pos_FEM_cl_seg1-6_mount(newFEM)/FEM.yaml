@@ -1,0 +1,6 @@
+FEM:
+  build:
+    fem_io_filename: ../database/matmodels/20200108_Rodrigo_M1_M2_residuals/20200108_IO_MODIFIED.mat
+    state_space_filename: ../database/matmodels/20200108_Rodrigo_M1_M2_residuals/20200108_MODIFIED.mat
+  reduction:
+    start_idx: 3
