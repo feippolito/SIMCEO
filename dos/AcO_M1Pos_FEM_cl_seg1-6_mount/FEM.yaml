@@ -5,3 +5,5 @@ FEM:
 
   reduction:
     start_idx: 3
+
+  reorder_RBM: true

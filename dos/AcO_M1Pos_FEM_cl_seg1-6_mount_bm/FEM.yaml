@@ -1,11 +1,12 @@
 FEM:
   build:
-    fem_io_filename: ../database/matmodels/old_consolidated/FEM_IO_MODIFIED.mat
-    state_space_filename: ../database/matmodels/old_consolidated/consolidated_MODIFIED.mat
+    fem_io_filename: ../database/bendingmodes/FEM_IO_WSTDP.mat
+    state_space_filename: ../database/matmodels/consolidated_withSTDP.mat
+    log_states: true
     output_support:
       bending_modes:
-        variable: {name: M1_surfaces_d}
-        path: ../database/bendingmodes/SSBM_transformation_matrices.mat
-
+        variable: {name: M1_surfaces_d, segment: 0}
+        path: ../database/bendingmodes/STBM_transformation_matrices.mat
+  
   reduction:
-    start_idx: 3d
+    start_idx: 3

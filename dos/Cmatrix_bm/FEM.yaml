@@ -1,0 +1,8 @@
+FEM:
+  build:
+    fem_io_filename: ../database/bendingmodes/FEM_IO_WSTBM_f.mat
+    state_space_filename: ../database/matmodels/old_consolidated/consolidated_withSTBM_f.mat
+    log_states: true
+    
+  reduction:
+    start_idx: 3

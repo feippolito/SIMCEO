@@ -197,8 +197,8 @@ class FEM:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.setLevel(verbose)
         self.logger.info('Instantiate')
-        #if kwargs:
-        #    self.Start(**kwargs)
+        if kwargs:
+            self.Start(**kwargs)
 
     def Start(self, state_space_filename=None,
               second_order_filename=None,
@@ -615,12 +615,7 @@ class FEM:
             bm_data = self.output_support['bending_modes']
             Q = self._read_mat_file(bm_data['path'],'Q_incell')
             U = self._read_mat_file(bm_data['path'],'U_')
-            #_U_6 = np.zeros(U[0,0].shape)
-            #_U_6[0:U[6,0].shape[0],0:U[6,0].shape[1]] = U[6,0]
-            #U[6,0] = _U_6
-
             Phi = self.__Phi__[bm_data['variable']['name']]
-            print((np.array(U[0,0])).shape)
             if 'segment' in bm_data['variable']:
                 segId = bm_data['variable']['segment']
                 self.logger.info('    |- segment: ' + str(segId))
@@ -628,9 +623,8 @@ class FEM:
             else:
                 segId = 0
                 self.logger.info('   |- segment: all segments')
-                Q = np.vstack([Q[k,0] for k in range(Q.shape[0])])
-                U = np.vstack([U[k,0] for k in range(U.shape[0])])
-
+                Q = self._create_diag_from_mat(mat=Q)#np.vstack([Q[k,0] for k in range(Q.shape[0])])
+                U = self._create_diag_from_mat(mat=U) #np.vstack([U[k,0] for k in range(U.shape[0])])
             _shape = U.shape 
             _init = _shape[0] * segId + 2
             _final = _init + 3*_shape[0]
@@ -667,6 +661,23 @@ class FEM:
                     'on_cuda': False
                 }
             self._info_bendingmodes()
+
+    def _create_diag_from_mat(self, mat=None):
+        _size = mat.shape[0]
+        _lin, _col = [], []
+        for k in range(_size):
+            _lin.append(mat[k,0].shape[0])
+            _col.append(mat[k,0].shape[1])
+        
+        ki, kii = 0, 0
+        _shape = (sum(_lin),sum(_col))
+        _result = np.zeros(_shape)
+        for k in range(_size):
+            xi, xii = ki+_lin[k], kii+_col[k]
+            _result[ki:xi,kii:xii] = mat[k,0][:,:]
+            ki, kii = xi, xii
+        
+        return _result
 
     def _info_bendingmodes(self):
         self.logger.info('    |- bending modes size: ' + str(self.bm_states['bm_magnitude'].shape[0]))
@@ -731,7 +742,7 @@ class FEM:
         
         # Create the state logging process
         if self.log_states:
-            _shape_ = (self.state['A'].shape[0], 20000)
+            _shape_ = (self.state['A'].shape[0], duration*2000 + 1 )
             self._start_state_logging(self.stateLogInfo['path'], _shape_, self.stateLogInfo['vartype'])
             time.sleep(.500)
         
