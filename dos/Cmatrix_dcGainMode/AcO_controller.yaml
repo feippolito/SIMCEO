@@ -1,0 +1,4 @@
+System:
+  parameters:
+    num: [-0.25]
+    denom: [1, -1]

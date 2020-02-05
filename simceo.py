@@ -185,7 +185,7 @@ class SGMT(Sfunction):
             else:
                 data = np.asarray( inputs[dof], order='C', dtype=np.float64 )
             #data = np.transpose( np.reshape( data , (-1,7) ) )
-            self.logger.debug(" . DOF: %s=|%s|", dof, np.array_str(norm(data,axis=1)))
+            #self.logger.debug(" . DOF: %s=|%s|", dof, np.array_str(norm(data,axis=1)))
             state[mirror][dof][:] = self.state0[mirror][dof][:] + data
             """
             if key=="TxyzRxyz":

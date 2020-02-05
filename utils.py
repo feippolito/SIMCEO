@@ -1,9 +1,16 @@
 
 import os
-import numpy as np
 import scipy.sparse as ssp
 import scipy.linalg as sli
+
+import scipy.io as sio
+import numpy as np
+
 import matplotlib.pyplot as plt
+import matplotlib.tri as mtri   
+import matplotlib.animation as animation
+import matplotlib as mpl
+import scipy.spatial as ssp
 
 try:
     import cupy as cp
@@ -13,12 +20,12 @@ except:
 
 _cudaSettingsDefault = {
     'n_bins': 2000,
-    'vartype': np.float32
+    'vartype': np.float64
 }
 
 _cpuSettingsDefault = {
     'n_bins': 2000,
-    'vartype': np.float32
+    'vartype': np.float64
 }
 
 
@@ -54,7 +61,36 @@ class LargeCompute:
                 for item in cudaSettings:
                     self._cudaSettings[item] = cudaSettings[item]
 
-        self._create_directory(self._savePath)   
+        self._create_directory(self._savePath)
+
+    def load_disp(self, states_path, dos_path, duration):
+        import yaml
+        with open(dos_path + '/FEM.yaml') as file:
+            cfg = yaml.load(file, Loader=yaml.FullLoader)
+        fem_ss = cfg['FEM']['build']['state_space_filename']
+        fem_io = cfg['FEM']['build']['fem_io_filename']
+
+        C = sio.loadmat(fem_ss)['C']
+        shape_st_ = (C.shape[1],duration*2000+1)
+        states = np.memmap(states_path, dtype=np.float32, mode='r+', shape=shape_st_)
+
+        data = sio.loadmat(fem_io)
+        fem_outputs=[(x[0][0],y[0]) for x,y in zip(data['FEM_IO']['outputs_name'][0,0],
+                                                data['FEM_IO']['outputs_size'][0][0])]
+
+        i_sum = 0
+        i_, ii_ = 0, 0
+        for k in fem_outputs:
+            if k[0] != 'M1_surfaces_d':
+                i_sum += k[1]
+            else:
+                ref_size = k[1]
+                i_, ii_ = i_sum, i_sum + ref_size
+        C = C[i_:ii_,:]
+        indexes = range(2,C.shape[0],3)
+        C = C[indexes, :]
+
+        return self.dot_time(C, states)
 
 
     def _create_directory(self, dir_name):
@@ -62,29 +98,19 @@ class LargeCompute:
             os.makedirs(dir_name)
 
     
-    def remove_ptt_from_disp(self, ptt, displacements,
-                            vartype=np.float32):
+    def remove_ptt(self, ptt, displacements, vartype = np.float64):
 
-        # Check if the variables exists
-        if displacements is None:
-            print("Please provide the proper displacements parameter.")
-            pass
-        if ptt is None:
-            print("Please provide the proper ptt parameter.")
-            pass
         # get the shape of the displacements
         _size = displacements.shape
         # Create the directory for results
         self._create_directory(self._savePath+'remove_ptt_from_disp/')
         # Create the results variable
         _varname =  'remove_ptt_from_disp/result.dat'
-        result = np.memmap(self._savePath + _varname, dtype=vartype, mode='w+', shape=_size) 
+        result = np.memmap(self._savePath + _varname, dtype=vartype, mode='w+', shape=_size)
+        ptt = np.memmap(self._savePath + _varname, dtype=vartype, mode='w+', shape=_size) 
         # If CUDA is available
         if self._onCuda:
             _vartype = self._cudaSettings['vartype']
-            # Check if vartypes are the same
-            if _vartype != vartype:
-                print(" * Variable types are diferent, please check the vartype parameter!")
             # Create the GPU matrices
             _const_ptt = cp.asarray(ptt, dtype=_vartype)
             # Create some constants
@@ -98,17 +124,20 @@ class LargeCompute:
                     kii = _size[1]
                 _disp_pack = cp.asarray(displacements[:,ki:kii], dtype=_vartype)
                 _dyn_ptt = cp.linalg.lstsq(_const_ptt, _disp_pack)[0]
-                _result = _disp_pack - cp.dot(_const_ptt, _dyn_ptt)
+                ptt[:,ki:kii] = cp.dot(_const_ptt, _dyn_ptt)
+                _result = _disp_pack - ptt[:,ki:kii]
                 result[:,ki:kii] = _result[:,:].get()
         else:
+            print("remove ptt not suport on cpu")
+            """
             #result = np.zeros(_size)
             for k in range(_size[1]):
                 _auxiliar = displacements[:,k]
                 _ptt = sli.lstsq(ptt, _auxiliar)[0]
                 _auxiliar_ = np.dot(ptt, _ptt)
                 result[:,k] = _auxiliar - _auxiliar_
-
-        return result
+            """
+        return result, ptt 
 
 
     def bm_to_disp_time(self, U, bending_modes,
@@ -136,26 +165,15 @@ class LargeCompute:
         # Compute the displacements
         for k in range(_time):
             # create the bending modes diagonal
-            _diag_bm = np.diag(bending_modes[:,k])
-            _disp = np.dot(U, _diag_bm)
-            _disp = np.sum(_disp, axis=1)
+            _disp = np.dot(U, bending_modes[:,k])
             result[:,k] = _disp[:]
 
         return result[:,:]
-
-
 
     def dot_time(self, b, a_t,
                  varname=None,
                  vartype=np.float32):
 
-        # Check if the variables exists
-        if a_t is None:
-            print("Please provide the proper a_t parameter.")
-            pass
-        if b is None:
-            print("Please provide the proper b parameter.")
-            pass
         # Create the directory for results
         _savePath = self._savePath + 'dot_time/'
         self._create_directory(_savePath)
@@ -188,6 +206,9 @@ class LargeCompute:
                 # Retrieve the data
                 result[:,ki:kii] = _gpu_result.get()[:,:]
         else:
+            print("dot_time not available on cpu")
+            pass
+            """ 
             # Create constants
             _prop = a_t.shape[1] // self.horizon
             _shape = (b.shape[0], a_t.shape[1])
@@ -203,5 +224,5 @@ class LargeCompute:
                 else:
                     kii = a_t.shape[1]
                 result[:,ki:kii] = np.dot(b[:,:], a_t[:,ki:kii])
-        
+            """        
         return result

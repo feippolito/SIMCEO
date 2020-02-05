@@ -1,0 +1,9 @@
+FEM:
+  build:
+    fem_io_filename: ../database/matmodels/AllResidualSoftDrive/AllResidualSoftDriveFEM_IO_WSSMode.mat
+    state_space_filename:  ../database/matmodels/AllResidualSoftDrive/AllResidualSoftDriveconsolidated_withSSMode.mat
+
+    log_states: true
+    
+  reduction:
+    start_idx: 3

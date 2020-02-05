@@ -1,0 +1,79 @@
+simulation:
+  sampling frequency: 2000 # [Hertz]
+  duration: 10 # [seconds]
+  server:
+    IP: 127.0.0.1
+#    IP: 34.213.27.234
+drivers:
+  wind_loads:
+    outputs:
+      Gravity:
+        lien: [FEM, OSS_Grav_CS0]
+      Distributed:
+        lien: [FEM, M1_distributed_windF]
+      TopEnd:
+        lien: [FEM, OSS_TopEnd_6F]
+      Truss:
+        lien: [FEM, OSS_Truss_6F]
+      GIR:
+        lien: [FEM, OSS_GIR_6F]
+      CRING:
+        lien: [FEM, OSS_CRING_6F]
+      M1:
+        lien: [FEM, OSS_M1_lcl_6F]
+      M1Cell:
+        lien: [FEM, OSS_Cell_lcl_6F]
+      M2:
+        lien: [FEM, MC_M2_lcl_force_6F]
+      #M2Cell:
+      #  lien: [FEM, MC_M2_MacroCell_F_6d]
+  FEM:
+    inputs:
+      OSS_Grav_CS0:
+        size: 3
+      OSS_M1_lcl_6F:
+        size: 42
+      OSS_Cell_lcl_6F:
+        size: 42
+      OSS_CRING_6F:
+        size: 18
+      OSS_TopEnd_6F:
+        size: 6
+      OSS_GIR_6F:
+        size: 6
+      OSS_Truss_6F:
+        size: 36
+      MC_M2_lcl_force_6F:
+        size: 42
+      #MC_M2_MacroCell_F_6d:
+      #  size: 6
+      M1_distributed_windF:
+        size: 5127
+    outputs:
+      OSS_M1_lcl:
+        size: 42
+      MC_M2_lcl_6D:
+        size: 42
+      OSS_Hardpoint_D:
+        size: 84
+      Bending Modes S1:
+        size: 165
+        logs: {decimation: 1}
+      Bending Modes S2:
+        size: 165
+        logs: {decimation: 1}
+      Bending Modes S3:
+        size: 165
+        logs: {decimation: 1}
+      Bending Modes S4:
+        size: 165
+        logs: {decimation: 1}
+      Bending Modes S5:
+        size: 165
+        logs: {decimation: 1}
+      Bending Modes S6:
+        size: 165
+        logs: {decimation: 1}
+      Bending Modes S7:
+        size: 154
+        logs: {decimation: 1}

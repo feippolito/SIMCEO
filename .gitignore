@@ -32,3 +32,6 @@ simceo.code-workspace
 testDT\
 *.sclogs
 html/
+movies/
+variables/
+LargeComputeLogs/

@@ -1,6 +1,6 @@
 simulation:
   sampling frequency: 2000
-  duration: 700
+  duration: 30
   server:
     IP: 127.0.0.1
 
@@ -10,9 +10,11 @@ drivers:
     sampling_rate: 2000
     inputs:
       Txyz:
-        lien: [FEM, OSS_M1_Translation]
+        lien: [FEM, OSS_M1_lcl]
+        size: [7, 3]
       Rxyz:
-        lien: [FEM, OSS_M1_Rotation]
+        lien: [FEM, OSS_M1_lcl]
+        size: [7, 3]
       modes:
         lien: [AcO_controller, M1 BM]
 

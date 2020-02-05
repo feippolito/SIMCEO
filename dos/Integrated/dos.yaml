@@ -12,9 +12,9 @@ drivers:
       Txyz:
         lien: [FEM, OSS_M1_Translation]
       Rxyz:
-        lien: ['FEM', OSS_M1_Rotation]
+        lien: [FEM, OSS_M1_Rotation]
       modes:
-        lien: [AcO_controller, M1 BM]
+        lien: [FEM, Bending Modes]
 
   M2:
     delay: 0
@@ -158,15 +158,14 @@ drivers:
       OSS_GIRDrive_D:
         logs: {decimation: 1}
         size: 4
-      #M1
-      OSS_M1_lcl:
-        size: 42
-        logs: {decimation: 1}
       #M1 HP loadcells
       OSS_Hardpoint_D:
         size: 84
         logs: {decimation: 1}
-      #Reshape M1
+      # M1
+      Bending Modes:
+        size: [7, 27]
+        logs: {decimation: 1}
       OSS_M1_Translation:
         size: [7, 3]
         logs: {decimation: 1}

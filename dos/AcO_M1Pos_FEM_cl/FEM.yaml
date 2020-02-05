@@ -2,6 +2,7 @@ FEM:
   build:
     fem_io_filename: ../database/matmodels/old_consolidated/FEM_IO_MODIFIED.mat
     state_space_filename: ../database/matmodels/old_consolidated/consolidated_MODIFIED.mat
+    reorder_RBM: true
 
   reduction:
     start_idx: 3

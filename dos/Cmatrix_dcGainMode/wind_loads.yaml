@@ -1,0 +1,5 @@
+wind loads:
+  load_filename: ../database/loads/WLC0012_IM_v3.mat
+  distributed_filename: ../database/loads/distributed maxRes M1 WLC0012.mat
+  bumpless_loads: False
+  fs: 200

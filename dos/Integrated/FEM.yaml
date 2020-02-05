@@ -1,7 +1,8 @@
 FEM:
   build:
-    fem_io_filename: ../database/matmodels/old_consolidated/FEM_IO_MODIFIED.mat
-    state_space_filename: ../database/matmodels/old_consolidated/consolidated_MODIFIED.mat
-
+    fem_io_filename: ../database/matmodels/old_consolidated/old_consolidated_rbm_FEM_IO_WSSBM.mat
+    state_space_filename: ../database/matmodels/old_consolidated/old_consolidated_rbm_withSSBM.mat
+    log_states: true
+    
   reduction:
     start_idx: 3
