@@ -1,6 +1,6 @@
 simulation:
   sampling frequency: 2000
-  duration: 100
+  duration: 20
   server:
     IP: 127.0.0.1
 
@@ -14,8 +14,7 @@ drivers:
       Rxyz:
         lien: [FEM, OSS_M1_Rotation]
       modes:
-        #lien: [FEM, Bending Modes]
-        lien: [AcO_controller, M1 BM]
+        lien: [BendingModesStatic0, M1 BM]
 
   M2:
     delay: 0
@@ -98,15 +97,15 @@ drivers:
         size: 4
         logs: {decimation: 1}
 
-  M1LocalControl0: #_wBM0:
+  M1LocalControl_wBM0:
     sampling_rate: 1
     server: false
     inputs:
       HP_F_Meas:
         lien: [M1HPloadcells0, M1_HP_F_meas]
-      #Bending Modes:
-      #  lien: [AcO_controller, M1 BM]
-      #  logs: {decimation: 1}
+      Bending Modes:
+        lien: [AcO_controller, M1 BM]
+        logs: {decimation: 1}
     split:
       indices_or_sections: [335, 670, 1005, 1340, 1675, 2010]
       axis: 1
@@ -141,6 +140,30 @@ drivers:
         size: 42
         logs: {decimation: 1}
 
+  BendingModesStatic0:
+    sampling_rate: 2000
+    server: false
+    inputs:
+      M1_actuators_segment_1:
+        lien: [M1LocalControl_wBM0, M1_Rel_F_S1]
+      M1_actuators_segment_2:
+        lien: [M1LocalControl_wBM0, M1_Rel_F_S2]
+      M1_actuators_segment_3:
+        lien: [M1LocalControl_wBM0, M1_Rel_F_S3]
+      M1_actuators_segment_4:
+        lien: [M1LocalControl_wBM0, M1_Rel_F_S4]
+      M1_actuators_segment_5:
+        lien: [M1LocalControl_wBM0, M1_Rel_F_S5]
+      M1_actuators_segment_6:
+        lien: [M1LocalControl_wBM0, M1_Rel_F_S6]
+      M1_actuators_segment_7:
+        lien: [M1LocalControl_wBM0, M1_Rel_F_S7]
+    outputs:
+      M1 BM:
+        logs: {decimation: 1}
+        size: [7, 27]
+
+
   FEM:
     inputs:
       #M1Ofl
@@ -153,19 +176,19 @@ drivers:
       OSS_Harpoint_delta_F:
         lien: [M1Pos0, M1Pos_DeltaF]
       M1_actuators_segment_1:
-        lien: [M1LocalControl0, M1_Rel_F_S1]
+        lien: [M1LocalControl_wBM0, M1_Rel_F_S1]
       M1_actuators_segment_2:
-        lien: [M1LocalControl0, M1_Rel_F_S2]
+        lien: [M1LocalControl_wBM0, M1_Rel_F_S2]
       M1_actuators_segment_3:
-        lien: [M1LocalControl0, M1_Rel_F_S3]
+        lien: [M1LocalControl_wBM0, M1_Rel_F_S3]
       M1_actuators_segment_4:
-        lien: [M1LocalControl0, M1_Rel_F_S4]
+        lien: [M1LocalControl_wBM0, M1_Rel_F_S4]
       M1_actuators_segment_5:
-        lien: [M1LocalControl0, M1_Rel_F_S5]
+        lien: [M1LocalControl_wBM0, M1_Rel_F_S5]
       M1_actuators_segment_6:
-        lien: [M1LocalControl0, M1_Rel_F_S6]
+        lien: [M1LocalControl_wBM0, M1_Rel_F_S6]
       M1_actuators_segment_7:
-        lien: [M1LocalControl0, M1_Rel_F_S7]
+        lien: [M1LocalControl_wBM0, M1_Rel_F_S7]
     outputs:
       #Mount
       OSS_AzDrive_D:
@@ -191,6 +214,8 @@ drivers:
       OSS_M1_Rotation:
         size: [7, 3]
         logs: {decimation: 1}
+
+    
 
 COMMENTS:
   science:

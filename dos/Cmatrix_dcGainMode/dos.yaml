@@ -1,6 +1,6 @@
 simulation:
   sampling frequency: 2000 # [Hertz]
-  duration: 10 # [seconds]
+  duration: 30 # [seconds]
   server:
     IP: 127.0.0.1
 #    IP: 34.213.27.234
@@ -9,20 +9,25 @@ drivers:
     outputs:
       Gravity:
         lien: [FEM, OSS_Grav_CS0]
+        logs: {decimation: 1}
       Distributed:
         lien: [FEM, M1_distributed_windF]
+        logs: {decimation: 1}
       TopEnd:
         lien: [FEM, OSS_TopEnd_6F]
       Truss:
         lien: [FEM, OSS_Truss_6F]
       GIR:
         lien: [FEM, OSS_GIR_6F]
+        logs: {decimation: 1}
       CRING:
         lien: [FEM, OSS_CRING_6F]
       M1:
         lien: [FEM, OSS_M1_lcl_6F]
+        logs: {decimation: 1}
       M1Cell:
         lien: [FEM, OSS_Cell_lcl_6F]
+        logs: {decimation: 1}
       M2:
         lien: [FEM, MC_M2_lcl_force_6F]
       M2Cell:

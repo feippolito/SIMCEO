@@ -29,6 +29,12 @@ _cpuSettingsDefault = {
 }
 
 
+class plot_bendingModes:
+
+    def __init__(self):
+        pass
+
+
 class LargeCompute:
 
     '''
@@ -98,37 +104,40 @@ class LargeCompute:
             os.makedirs(dir_name)
 
     
-    def remove_ptt(self, ptt, displacements, vartype = np.float64):
+    def remove_ptt(self, Q, displacements, vartype = np.float64):
 
         # get the shape of the displacements
         _size = displacements.shape
         # Create the directory for results
         self._create_directory(self._savePath+'remove_ptt_from_disp/')
         # Create the results variable
-        _varname =  'remove_ptt_from_disp/result.dat'
-        result = np.memmap(self._savePath + _varname, dtype=vartype, mode='w+', shape=_size)
-        ptt = np.memmap(self._savePath + _varname, dtype=vartype, mode='w+', shape=_size) 
+        _Resultvarname =  'remove_ptt_from_disp/result.dat'
+        _Pttvarname =  'remove_ptt_from_disp/ptt.dat'
+        result = np.memmap(self._savePath + _Resultvarname, dtype=vartype, mode='w+', shape=_size)
+        ptt = np.memmap(self._savePath + _Pttvarname, dtype=vartype, mode='w+', shape=_size) 
         # If CUDA is available
         if self._onCuda:
             _vartype = self._cudaSettings['vartype']
             # Create the GPU matrices
-            _const_ptt = cp.asarray(ptt, dtype=_vartype)
+            _const_Q = cp.asarray(Q, dtype=_vartype)
             # Create some constants
             _packSize = self._cudaSettings['n_bins']
             _packs = _size[1] // self._cudaSettings['n_bins']
             # for each time packages
-            for k in range(_packs):
+            for k in range(_packs + 1):
                 ki = k * _packSize
                 kii = (k+1)*_packSize 
                 if kii > _size[1]:
                     kii = _size[1]
                 _disp_pack = cp.asarray(displacements[:,ki:kii], dtype=_vartype)
-                _dyn_ptt = cp.linalg.lstsq(_const_ptt, _disp_pack)[0]
-                ptt[:,ki:kii] = cp.dot(_const_ptt, _dyn_ptt)
-                _result = _disp_pack - ptt[:,ki:kii]
+                _aux = np.linalg.lstsq(Q, displacements[:,ki:kii])[0]
+                _aux_cp = cp.asarray(_aux, dtype=_vartype)
+                ptt_cp = cp.dot(_const_Q, _aux_cp)
+                _result = _disp_pack - ptt_cp
                 result[:,ki:kii] = _result[:,:].get()
+                ptt[:,ki:kii]= ptt_cp.get()
         else:
-            print("remove ptt not suport on cpu")
+            print("remove ptt not suported on cpu")
             """
             #result = np.zeros(_size)
             for k in range(_size[1]):

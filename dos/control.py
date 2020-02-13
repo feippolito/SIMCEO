@@ -5,6 +5,9 @@ from .sh_aco_driver import SHAcO
 from .sh_aco_debug_driver import SHAcO_debug
 from .MountController import Mount
 from .M1LocalControl0Controller import M1LocalControl0
+from .M1LocalControl_wBM0Controller import M1LocalControl_wBM0
+
+from .BendingModesStatic0Controller import BendingModesStatic0
 from .M1HPloadcells0Controller import M1HPloadcells0
 from .M1Pos0Controller import M1Pos0
 from .M1PosDebug0Controller import M1PosDebug0
