@@ -1,5 +1,5 @@
 mirror: M1
-mirror_args: {mirror_modes: bending modes, N_MODE: 27}
+mirror_args: {mirror_modes: felipe bending modes, N_MODE: 27}
 state:
   Txyz:
   - [-1.0312126921672367e-07, -8.363882196548141e-08, -4.2672914574801504e-07]

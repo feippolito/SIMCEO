@@ -1,0 +1,122 @@
+simulation:
+  sampling frequency: 1
+  duration: 100
+  server:
+    IP: 127.0.0.1
+
+drivers:
+  M1:
+    delay: 0
+    sampling_rate: 1
+    inputs:
+      Txyz:
+        size: [7, 3]
+      Rxyz:
+        size: [7, 3]
+      modes:
+        size: [7, 154]
+
+  M2:
+    delay: 0
+    sampling_rate: 1
+    inputs:
+      Txyz:
+        size: [7, 3]
+      Rxyz:
+        size: [7, 3]
+
+  wfs48:
+    delay: 0
+    sampling_rate: 1
+    outputs:
+      M12_RBM:
+        sampling_rate: 1
+        size: 273
+        logs: {decimation: 1}
+
+  AcO_controller:
+      server: false
+      inputs:
+        x_hat:
+          lien: [wfs48, M12_RBM]
+      shape: [7, 39]
+      split:
+        indices_or_sections: [3, 6, 9, 12]
+        axis: 1
+      outputs:
+        M1 Rxyz:
+          sampling_rate: 1
+          lien: [M1, Rxyz]
+          logs: {decimation: 1}
+        M1 Txyz:
+          sampling_rate: 1
+          lien: [M1, Txyz]
+          logs: {decimation: 1}
+        M2 Rxyz:
+          sampling_rate: 1
+          lien: [M2, Rxyz]
+          logs: {decimation: 1}
+        M2 Txyz:
+          sampling_rate: 1
+          lien: [M2, Txyz]
+          logs: {decimation: 1}
+        M1 BM:
+          sampling_rate: 1
+          lien: [BM2F, BM]
+          logs: {decimation: 1}
+
+  BM2F:
+    sampling_rate: 1
+    server: false
+    inputs:
+      BM:
+        size: [7, 27]
+    shape: [1144]
+    split:
+      indices_or_sections: [165, 330, 495, 660, 825, 990]
+      axis: 0
+    outputs:
+      F1:
+        lien: [K, F1] 
+        logs: {decimation: 1}
+      F2:
+        lien: [K, F2] 
+        logs: {decimation: 1}
+      F3:
+        lien: [K, F3] 
+        logs: {decimation: 1}
+      F4:
+        lien: [K, F4] 
+        logs: {decimation: 1}
+      F5:
+        lien: [K, F5] 
+        logs: {decimation: 1}
+      F6:
+        lien: [K, F6] 
+        logs: {decimation: 1}
+      F7:
+        lien: [K, F7]
+        logs: {decimation: 1}
+
+  K:
+    sampling_rate: 1
+    server: false
+    inputs:
+      F1:
+        size: 165
+      F2:
+        size: 165
+      F3:
+        size: 165
+      F4:
+        size: 165
+      F5:
+        size: 165
+      F6:
+        size: 165
+      F7:
+        size: 154
+    outputs:
+      BM:
+        lien: [M1, modes] 
+        logs: {decimation: 1}

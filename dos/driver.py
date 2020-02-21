@@ -5,6 +5,8 @@ import logging
 import pandas as pd
 from numpy.linalg import norm
 from . import control
+from importlib import import_module
+
 logging.basicConfig()
 class IO:
     def __init__(self,tag,size=0, lien=None, logs=None):
@@ -155,14 +157,14 @@ class Server(Driver):
                     for k,v in self.outputs.items():
                         if (step-self.delay)%v.sampling_rate==0:
                             self.logger.debug('Outputing %s!',k)
-                            try:
-                                v.data[...] = np.asarray(reply[k]).reshape(v.size)
-                            except ValueError:
-                                self.logger.warning('Resizing %s!',k)
-                                __red = np.asarray(reply[k])
-                                v.size = __red.shape
-                                v.data = np.zeros(__red.shape)
-                                v.data[...] = __red
+                            #try:
+                            v.data[...] = np.asarray(reply[k]).reshape(v.size)
+                            #except ValueError:
+                            #    self.logger.warning('Resizing %s!',k)
+                            #    __red = np.asarray(reply[k])
+                            #    v.size = __red.shape
+                            #    v.data = np.zeros(__red.shape)
+                            #    v.data[...] = __red
                             if v.logs is not None and (step-self.delay)%v.logs.decimation==0:
                                 self.logger.debug('LOGGING')
                                 v.logs.add(v.data.copy())
@@ -356,6 +358,7 @@ class Client(Driver):
     def associate(self,prm):
         sys = list(prm.keys())[0] 
         self.system = getattr(control,sys)(**prm[sys])
+
 class Atmosphere(Driver):
     def __init__(self,tau,tag,server,verbose=logging.INFO,**kwargs):
         Driver.__init__(self,tau,tag)

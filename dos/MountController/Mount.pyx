@@ -1,46 +1,52 @@
 cdef extern from "Mount.h":
-    ctypedef double real_T
-    ctypedef struct ExtU_Mount_T:
-        real_T Reference[3] #                /* '<Root>/Reference' */
-        real_T Feedback[20] #                /* '<Root>/Feedback' */
-    ctypedef struct ExtY_Mount_T:
-        real_T Output[20] #                  /* '<Root>/Output' */
-    ExtU_Mount_T Mount_U
-    ExtY_Mount_T Mount_Y
-    void Mount_initialize()
-    void Mount_step()
-    void Mount_terminate()
+	ctypedef double real_T
+	ctypedef struct ExtU_Mount_T:
+		real_T Reference[3] #              /* '<Root>/Reference' */
+		real_T Feedback[20]   #              /* '<Root>/Feedback' */
+	ctypedef struct ExtY_Mount_T:
+		real_T Output[20]     #              /* '<Root>/Output' */
+	ExtU_Mount_T Mount_U
+	ExtY_Mount_T Mount_Y
+	void Mount_initialize()
+	void Mount_step()
+	void Mount_terminate()
 
 cimport numpy as np
 import numpy as np
 
-class Mount:
+class Mount: 
+	'''
+	This class was automatically generated from the simulink subsystem 'Mount'.
 
-    def __init__(self, reference=np.zeros(3)):
-        self.reference = reference
-        self.__yout = np.zeros(0)
+	For more information on how this code was generated access:
+	https://github.com/feippolito/NSEElib/tree/master/MATLAB/%2Bcompile - pycreate.m
 
-    def init(self):
-        Mount_initialize()
-        for k in range(3):
-            Mount_U.Reference[k] = self.reference[k]
-        self.__yout = np.zeros(20)
+	Generated on 19-Feb-2020.
+	'''
 
-    def update(self,np.ndarray u):
-        #u = np.single(u.ravel())
-        cdef double[:] __u
-        cdef int k
-        __u = np.ravel(np.asarray(u))
-        for k in range(20):
-            Mount_U.Feedback[k] = __u[k]
-        Mount_step()
+	def __init__(self, reference = np.zeros(3) ):
+		self.reference = reference
+		self.__yout = np.zeros(0)
 
-    def output(self):
-        cdef int k
-        for k in range(20):
-            self.__yout[k] = Mount_Y.Output[k]
-        return np.atleast_2d(self.__yout)
+	def init(self):
+		Mount_initialize()
+		for k in range(3):
+			Mount_U.Reference[k] = self.reference[k]
+		self.__yout = np.zeros(20)
 
-    def terminate(self):
-        Mount_terminate()
+	def update(self, np.ndarray u):
+		cdef double[:] __u
+		cdef int k
+		__u = np.ravel(np.asarray(u))
+		for k in range(20):
+			Mount_U.Feedback[k] = __u[k]
+		Mount_step()
 
+	def output(self):
+		cdef int k
+		for k in range(20):
+			self.__yout[k] = Mount_Y.Output[k]
+		return np.atleast_2d(self.__yout)
+
+	def terminate():
+		Mount_terminate()

@@ -1,6 +1,6 @@
 simulation:
   sampling frequency: 2000
-  duration: 100
+  duration: 30
   server:
     IP: 127.0.0.1
 
@@ -63,7 +63,7 @@ drivers:
         sampling_rate: 20000
         logs: {decimation: 20000}
 
-  M1Pos0:
+  M1Pos_fullHpK0:
     sampling_rate: 1
     server: false
     inputs:
@@ -98,12 +98,27 @@ drivers:
         size: 4
         logs: {decimation: 1}
 
+  M1loadcells_fullHpK:
+    sampling_rate: 1
+    server: false
+    inputs:
+      M1_HP_cmd:
+        size: 42
+        lien: [M1Pos_fullHpK0, M1Pos_DeltaF]
+      M1_HP_D:
+        size: 84
+        lien: [FEM, OSS_Hardpoint_D]
+    outputs:
+      M1_HP_F_meas:
+        size: 42
+        logs: {decimation: 1}
+
   M1LocalControl0: #_wBM0:
     sampling_rate: 1
     server: false
     inputs:
       HP_F_Meas:
-        lien: [M1HPloadcells0, M1_HP_F_meas]
+        lien: [M1loadcells_fullHpK, M1_HP_F_meas]
       #Bending Modes:
       #  lien: [AcO_controller, M1 BM]
       #  logs: {decimation: 1}
@@ -126,21 +141,6 @@ drivers:
       M1_Rel_F_S7:
         size: 306
 
-  M1HPloadcells0:
-    sampling_rate: 1
-    server: false
-    inputs:
-      M1_HP_cmd:
-        size: 42
-        lien: [M1Pos0, M1Pos_DeltaF]
-      M1_HP_D:
-        size: 84
-        lien: [FEM, OSS_Hardpoint_D]
-    outputs:
-      M1_HP_F_meas:
-        size: 42
-        logs: {decimation: 1}
-
   FEM:
     inputs:
       #M1Ofl
@@ -151,7 +151,7 @@ drivers:
       OSS_GIRDrive_F:
         lien: [Mount, Mount_GIRDrive_F]
       OSS_Harpoint_delta_F:
-        lien: [M1Pos0, M1Pos_DeltaF]
+        lien: [M1Pos_fullHpK0, M1Pos_DeltaF]
       M1_actuators_segment_1:
         lien: [M1LocalControl0, M1_Rel_F_S1]
       M1_actuators_segment_2:
