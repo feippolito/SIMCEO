@@ -1292,6 +1292,8 @@ for k_d in self.drivers:
             prm = pickle.load(f)
     except:
         raise
+    if k_d == 'FEM':
+        prm['duration'] = self.cfg['simulation']['duration']
     d.associate(prm)
 @
 The device parameter are formatted into messages that will be used to
