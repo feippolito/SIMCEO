@@ -140,7 +140,6 @@ class Server(Driver):
             self.msg['method_id'] = ''
             self.msg['args'].clear()
             reply = self.server._recv_()
-
         self.output(step)
         
     def output(self,step):
@@ -310,7 +309,6 @@ class Client(Driver):
         '''
         self.system = None
 
-
     def start(self):
         self.logger.debug('Starting!')
     def init(self):
@@ -320,33 +318,17 @@ class Client(Driver):
         if self.inputs and (step>=self.delay and (step-self.delay)%self.sampling_rate==0):
             self.logger.debug('Updating!')
             u = np.hstack([_.data.reshape(1,-1) for _  in self.inputs.values()])
-            '''
-            if self.reorder:
-                self.logger.debug('Reordering! ')
-                # Reorder data before update -yaml-reorder{segments:n1,groups:n2,inputs:n3}
-                u = np.hstack([x[i].reshape(1,-1) for i in range(self.reorder['segments'])\
-                                    for x in np.split(u.reshape(-1,self.reorder['groups']),\
-                                                      self.reorder['inputs'])])
-            '''
             self.system.update(u)
             self.logger.debug('u: %s',u.shape)
-            self.output(step)
+        self.output(step)
 
     def output(self,step):
         if step>=self.delay:
-            #a = 0
-            #b = 0
             data = np.split( self.system.output().reshape(self.shape), **self.split)
             for k,v in self.outputs.items():
                 if (step-self.delay)%v.sampling_rate==0:
                     self.logger.debug('Outputing %s!',k)
                     v.data[...] = data.pop(0).reshape(v.size)
-                    """
-                    b = a + v.data.size
-                    self.logger.debug('%s [%s]: [%d,%d]',k,v.size,a,b)
-                    v.data[...] = self.system.output()[0,a:b].reshape(v.size)
-                    a = b
-                    """
                     if v.logs is not None and (step-self.delay)%v.logs.decimation==0:
                         self.logger.debug('LOGGING')
                         v.logs.add(v.data.copy())
@@ -356,8 +338,13 @@ class Client(Driver):
         self.logger.debug('Terminating!')
 
     def associate(self,prm):
-        sys = list(prm.keys())[0] 
-        self.system = getattr(control,sys)(**prm[sys])
+        sys = list(prm.keys())[0]
+        try:
+            self.system = getattr(control,sys)(**prm[sys])
+        except AttributeError:
+            _controller = 'drivers.' + sys + 'Controller.' + sys
+            _module = import_module(_controller)
+            self.system = getattr(_module, sys)(**prm[sys])
 
 class Atmosphere(Driver):
     def __init__(self,tau,tag,server,verbose=logging.INFO,**kwargs):
