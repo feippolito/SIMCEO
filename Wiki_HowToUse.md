@@ -92,12 +92,6 @@ SIMCEO/
 ├── calibration_dbs
 ├── doc
 ├── dos
-│   ├── SimulationConfigurationDir
-│   │   ├── dos.yaml
-│   │   ├── driver1.yaml
-│   │   ├── driver2.yaml
-│   │   └── FEM.yaml
-│   ├── SimulinkCompiledDrivers
 │   ├── control.py
 │   ├── dos.py
 │   ├── driver.py
@@ -109,14 +103,25 @@ SIMCEO/
 │   ├── __pycache__
 │   ├── windload_colored.py
 │   └── windload_simulink.py
-├── NotebookSimulation.ipynb
+├── Simulation_config
+│   ├── Simulation_01
+│   │   ├── dos.yaml
+│   │   ├── driver1.yaml
+│   │   ├── driver2.yaml
+│   │   └── FEM.yaml
+├── Simulation_archive
+|   ├── ArchivedNotebookSimulation.ipynb
+├── drivers
+│   ├── SimulinkCompiledDrivers
+├── ActiveNotebookSimulation.ipynb
 ├── simceo.py
 └── setup.py
 ```
-- **. /** -  All notebooks simulations (.ipynb) should run from the SIMCEO root folder.
+- **. /** -  Notebook simulations (.ipynb) should run from the SIMCEO root folder.
+- **Simulation_archives** -  Notebook simulations (.ipynb) when not active should be stored in this directory.
 - **Calibration_dbs** - This folder is requeried for the wavefront sensor driver.
-- **dos** - The dos/ directory contains the simulations configuration folders requeried for simceo.
-  - **SimulationConfigurationDir** - This is where the simulation is defined. The dos.yaml contains the simulation configurations. Each driver must also have its own .yaml file with it respective configuration.
+- **Simulation_config** - This directory contains the simulations configuration folders requeried for simceo.
+  - **Simulation_01** - Each simulation must have it's own configuration directory. This folder can be named as desired and contains all the drivers (driver.yaml) and simulation (dos.yaml) configuration files.
 - **Telescope** - Main driver folder - FEM and windowloads
 
 

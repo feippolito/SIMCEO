@@ -9,13 +9,14 @@ import h5py
 import scipy.io as spio
 import scipy.signal as ssig
 
+COMPUTE_ITEMS = ['M1', 'M1Cell', 'CRING',
+                 'TopEnd', 'GIR',
+                 'Truss', 'M2']
 
-DEFAULT_ITEMS = ["CRING", "GIR", 
-                "M1", "M1Cell", 
-                "M2", "M2Cell", 
-                "Truss", "TopEnd"]
-
-DEFAULT_VARIABLE_PATH = './variables/'
+WL_ITEMS = ['Gravity', 'M1',
+            'M1Cell',  'CRING',
+            'TopEnd',  'GIR',
+            'Truss',   'OSS_BASE_6F', 'M2']
 
 class WindLoad:
 
@@ -35,8 +36,12 @@ class WindLoad:
                 distributed_filename=None,
                 savefiles_path=None,
                 bumpless_loads=False,
-                fs=200):
+                fs=200,
+                reduce = None):
         self.logger.info('Starting wind loads...')
+
+        self.b_coefs,  self.a_coefs = dict(), dict()
+        self.gpu_data, self.outputs = dict(), dict()
 
         if savefiles_path is not None:
             self.savepath = savefiles_path
@@ -44,13 +49,49 @@ class WindLoad:
             self.savepath = './variables/'
         self.fs = fs
 
+        # Define Outputs(...) methode depending on reduce kwarg
+        if reduce is not None:
+            self.logger.info('Wind Loads outputs reduced.')
+            new_key = list(reduce.keys())[0]
+            self.wload_items = reduce[new_key]
+            self.logger.debug(new_key, ':', self.wload_items)
+            def Outputs(self, **kwargs):
+                i = 0
+                reduced_outputs = {}
+                for element in WL_ITEMS:
+                    if i == 0:
+                        reduced_outputs[new_key] = self.outputs[element]
+                    else:
+                        reduced_outputs[new_key] = np.concatenate([reduced_outputs[new_key], self.outputs[element]])
+                    i += 1
+                return reduced_outputs
+        else:
+            self.wload_items = WL_ITEMS
+            def Outputs(self, **kwargs):
+                return self.outputs
+
+        self.__class__.Outputs = Outputs 
+
         if not os.path.exists(self.savepath):
             os.makedirs(self.savepath)
 
         self.mem_data  = dict()
         if load_filename is not None:
             load_data = spio.loadmat(load_filename)['IMLoads']
-            for element in DEFAULT_ITEMS:
+            for element in WL_ITEMS:
+                if reduce is not None:
+                    if element not in self.wload_items:
+                        try:
+                            ns = load_data[element][0,0]['signals'][0,0]['values'][0,0].shape[1]
+                        except ValueError:
+                            if element == 'Gravity':
+                                ns = 3
+                            if element == 'OSS_BASE_6F':
+                                ns = 6
+                        self.logger.info('  * ' + element + ' is deactivated:')
+                        self.logger.info('   |- shape: ' + str(ns))
+                        self.outputs[element] = np.zeros(ns)   
+            for element in COMPUTE_ITEMS:
                 cpu_array = load_data[element][0,0]['signals'][0,0]['values'][0,0].T
                 filename  = self.savepath + element + '.dat'
                 fileshape = cpu_array.shape
@@ -93,6 +134,14 @@ class WindLoad:
         self.logger.info('   |- shape: ' + str(fileshape))
         self.logger.info('   |- in: ' + filename)
 
+        filename, fileshape  = self.savepath + 'oss_base.dat', (6, self.tmax_dim)
+        self.mem_data['OSS_BASE_6F'] = np.memmap(filename, dtype=np.float32, mode='w+', shape=fileshape)
+        self.mem_data['OSS_BASE_6F'][:,:] = np.zeros((6, self.tmax_dim), dtype=np.float32)
+        
+        self.logger.info('  * ' + "OSS_BASE_6F" + ' Memory Map:')
+        self.logger.info('   |- shape: ' + str(fileshape))
+        self.logger.info('   |- in: ' + filename)
+
         if bumpless_loads:
             self.logger.info(' ** Computing bumpless filter...')
             self.bumpless_fitler()
@@ -111,7 +160,8 @@ class WindLoad:
         bump_filt_ctf = ((4.5/settling_time)**2, [1, 2*4/settling_time, (4.5/settling_time)**2])
         bump_filt = ssig.cont2discrete(bump_filt_ctf, dt)
 
-        for element in DEFAULT_ITEMS:
+        for element in self.wload_items:
+            print(element)
             offset = self.mem_data[element][:,0]
             smooth_offset = np.zeros((self.mem_data[element].shape), dtype=np.float32)
             response = ssig.step(bump_filt, T=time_vec)[0]
@@ -134,13 +184,10 @@ class WindLoad:
         self.pv = int( np.ceil( Tv / dt ) )
         self.fv = int( 1 / Tv)
 
-        self.b_coefs,  self.a_coefs = dict(), dict()
-        self.gpu_data, self.outputs = dict(), dict()
         for element in self.mem_data:
             cpu_array = self.mem_data[element][:,0:2].view(dtype=np.float32, type=np.ndarray)
             self.gpu_data[element] = cp.asarray(cpu_array, dtype=np.float32)
 
-    
     def Update(self, **kwargs):
         
         for s in self.gpu_data:
@@ -162,9 +209,7 @@ class WindLoad:
         
         self.k =  self.k + 1
 
-    def Outputs(self, **kwargs):
-        
-        return self.outputs
+    # Outputs function is defined inside Start(...) methode
 
     def Terminate(self, **kwargs):
         return "Wind loads deleted!"
